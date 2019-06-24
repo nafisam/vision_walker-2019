@@ -17,7 +17,8 @@ def detect(input, width, threshold):
     array = array[array != 0]
 
     # For now we assume super close object mostly filling screen = bad.
-    # The following 2 lines return 1 if there are too many error states in the array, 1 means nothing happens in test_haptics
+    # The following 2 lines return 1 if there are too many error states in the array, 1 means nothing happens in test_haptics 
+    # so if we want to be over cautious we should probably make far away buzz
     if len(array) < 200:
         return 1
 
@@ -37,7 +38,7 @@ def detect(input, width, threshold):
 
         slope = (y2 - y1) / width
 
-        index += width	# why are we doing this? it skips <width> points, is it just to be faster? operating under the assumption that any points between those we're comparing would yield similar results
+        index += width	# why are we doing this? it skips <width> points, is it just to be faster? operating under the assumption that any points between those we're comparing would yield similar results?
 
         # Break out of the loop if we have a non-positive slope.
 	# This is the case of a regular obstacle
@@ -46,13 +47,12 @@ def detect(input, width, threshold):
         
 	# This is the case of a drop-off, ie stairs, curb, etc.
         if slope > 200:	# any reason why 200?
-            return y1	# by returning y1 we will trigger the obstacle detection, however I think the distance away may be not be a good representation
-			# y1 is the depth of the obstacle so if it was a very steep drop it might return a far away distance even if the drop point was close, I think returning y2 might fix this?
+            return y1
 
     # Continue where we left off from ^
     # Find the lowest y-value, corresponding to the closest point.
-    while index < len(array):			# how does this loop prevent it reporting the closest point if the closest point is empty ground in front of it?
-        if array[index] < distance:		# could we fix this by putting just these middle 2 lines inside the "if slope < -2:" instead of break?
+    while index < len(array):
+        if array[index] < distance:
             distance = array[index]
         index += 1
     if DEBUG:
