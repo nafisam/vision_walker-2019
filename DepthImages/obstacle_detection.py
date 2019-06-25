@@ -42,11 +42,11 @@ def detect(input, width, threshold):
 
         # Break out of the loop if we have a non-positive slope.
 	# This is the case of a regular obstacle
-        if slope < -2:	# why -2? just to give a little leeway for error?
+        if slope < -2:
             break
         
 	# This is the case of a drop-off, ie stairs, curb, etc.
-        if slope > 200:	# any reason why 200?
+        if slope > 200:
             return y1
 
     # Continue where we left off from ^
