@@ -4,14 +4,15 @@ import signal
 import sys
 import vibrate
 import pyttsx
-# use Raspberry Pi board pin numbers
+
+# use Raspberry Pi BCM pin numbers
 GPIO.setmode(GPIO.BCM)
 
-# set GPIO Pins #trig: 4, 22 #echo: 17, 16
-
-
+# Assigning GPIO pins for trigger and echos to the sensors
 pinTrigger = [24,23,18,6,17,5,26]
 pinEcho = [16,12,21,20,4,19,22]
+
+#Exit function - cleans up the ports
 def close(signal, frame):
 	print("\nTurning off ultrasonic distance detection...\n")
 	GPIO.cleanup()
@@ -24,6 +25,7 @@ signal.signal(signal.SIGINT, close)
 GPIO.setup(pinTrigger, GPIO.OUT)
 GPIO.setup(pinEcho, GPIO.IN)
 
+#Distance function
 def distance(sensor_num):
         # set GPIO input and output channels
         GPIO.setup(pinTrigger[sensor_num], GPIO.OUT)
@@ -38,58 +40,64 @@ def distance(sensor_num):
 	startTime = time.time()
 	stopTime = time.time()
 
-	# save start time
+	#Saves start time
 	while 0 == GPIO.input(pinEcho[sensor_num]):
 		startTime = time.time()
 
-	# save time of arrival
+	#Saves stop time
 	while 1 == GPIO.input(pinEcho[sensor_num]):
 		stopTime = time.time()
 
-	# time difference between start and arrival
+	#Time difference between start and stop
 	TimeElapsed = stopTime - startTime
-	# multiply with the sonic speed (34300 cm/s)
-	# and divide by 2, because there and back
+	
+	#Multiply with the Sonic Speed (34300 cm/s) and divide by 2, because there and back
 	distance = (TimeElapsed * 34300) / 2
 	return distance
 
+#Main loop
 while True:
+	#Distance array
         dist = [0,0,0,0,0,0,0]
-        measurement = [200, 100]
+  	
+	#Reading of first sensor
         dist[0] = distance(0)
 	print ("Distance1 : %.1f cm" % dist[0])
 	time.sleep(0.1)
 
-##	Second sensor
+	#Reading of second sensor
 	dist[1] = distance(1)
 	print ("Distance 2: %.1f cm" % dist[1])
 	time.sleep(0.1)
 	
-	## Third sensor
+	# Reading of third sensor
 	dist[2] = distance(2)
 	print ("Distance 3: %.1f cm" % dist[2])
 	time.sleep(0.1)
 	
-	## fourt sensor
+	#Reading of fourth sensor
 	dist[3] = distance(3)
 	print ("Distance 4: %.1f cm" % dist[3])
 	time.sleep(0.1)
 	
-	## fifth sensor
+	# Reading of fifth sensor
 	dist[4] = distance(4)
 	print ("Distance 5: %.1f cm" % dist[4])
 	time.sleep(0.1)
 	
-	## sixth sensor
+	##Reading of sixth sensor
 	dist[5] = distance(5)
 	print ("Distance 6: %.1f cm" % dist[5])
 	time.sleep(0.1)
 	
-	#sevent sensor
+	#Reading of seventh sensor
 	dist[6] = distance(6)
 	print ("Distance 7: %.1f cm" % dist[6])
-
-	#0 -100 cm close vibration
+	
+	##NAVIGTIONAL LOGIC
+	#0 -100 cm close - high vibration
+	
+	#If the first sensor detects an object within 100 cm, go into this statement
 	if 0 < dist[0] <= 100:
             x = 0
             for i in range (1, 7):
