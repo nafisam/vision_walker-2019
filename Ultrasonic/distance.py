@@ -9,8 +9,8 @@ import pyttsx
 GPIO.setmode(GPIO.BCM)
 
 # Assigning GPIO pins for trigger and echos to the sensors
-pinTrigger = [24,23,18,6,17,5,26]
-pinEcho = [16,12,21,20,4,19,22]
+pinTrigger = [24,23,18,6,17,5,26,2,9]
+pinEcho = [16,12,21,20,4,19,22,10,11]
 
 #Exit function - cleans up the ports
 def close(signal, frame):
@@ -58,7 +58,7 @@ def distance(sensor_num):
 #Main loop
 while True:
 	#Distance array
-        dist = [0,0,0,0,0,0,0]
+        dist = [0,0,0,0,0,0,0,0,0]
   	
 	#Reading of first sensor
         dist[0] = distance(0)
@@ -94,6 +94,16 @@ while True:
 	dist[6] = distance(6)
 	print ("Distance 7: %.1f cm" % dist[6])
 	
+	#Reading of eigth sensor (left side)
+	dist[7] = distance(7)
+	print ("Distance 8: %.1f cm" % dist[7])
+	
+	#Reading of 9th sensort (right side)
+	dist[8] = distance(8)
+	print ("Distance 8: %.1f cm" % dist[8])
+	
+	
+	
 	##NAVIGTIONAL LOGIC
 	#0 -100 cm close - high vibration
 	
@@ -105,12 +115,16 @@ while True:
                     x = x + 1
             if 4 <= x <= 6:
                 vibrate.high_vibration(1)
-                print("Right Sensors Activated: buzz low left")
+                print("Right Sensors Activated: buzz high left")
                 continue
             else:
-                vibrate.high_vibration(0)
-                print("Right  Sensors Activated: buzz low right")
-                continue
+		if dist[7] > 100:
+			vibrate.high_vibration(1)
+			print("Wall ahead: rotate left")
+		else:
+                	vibrate.high_vibration(0)
+                	print("Right  Sensors Activated: buzz high right")
+                	continue
         
         # center sensors  
         elif 0 < dist[3] <= 100 or 0 < dist[4] <= 100:
@@ -144,9 +158,13 @@ while True:
                 print("Left Sensors Activated: buzz low right")
                 continue
             else:
-                vibrate.high_vibration(1)
-                print("Left Sensors Activated: buzz low left")
-                continue
+		if dist[8] > 100:
+			vibrate.high_vibration(0)
+			print("Wall ahead: rotate right") #hallway to right is open
+		else:
+                	vibrate.high_vibration(1)
+                	print("Left Sensors Activated: buzz low left")
+                	continue
     
 	######100-200 med vibration
 ##      right sensor
@@ -160,9 +178,13 @@ while True:
                 print("right sensor: buzz medium  left")
                 continue
             else:
-                vibrate.medium_vibration(0)
-                print("right sensor: buzz medium right")
-                continue
+		if dist[7] > 150:
+			vibrate.medium_vibration(1)
+			print("Wall ahead: rotate left") #wall ahead, left hallway clear
+		else:
+                	vibrate.medium_vibration(0)
+                	print("Right  Sensors Activated: buzz medium right")
+                	continue
         
         # center sensors  
         elif 100 < dist[3] <= 150 or 100 < dist[4] <= 150:
@@ -196,11 +218,14 @@ while True:
                 print("Left: buzz med  right")
                 continue
             else:
-                vibrate.medium_vibration(1)
-                print("Left: buzz med left")
-                continue
-    
-            
+		if dist[8] > 150:
+			vibrate.medium_vibration(0)
+			print("Wall ahead: rotate right") #hallway to right is open
+		else:
+                	vibrate.medium_vibration(1)
+                	print("Left Sensors Activated: buzz low left")
+                	continue
+           
 	###### >200 far vibration
 ##      right sensor
         elif 150 <  dist[0] < 200:
@@ -213,10 +238,14 @@ while True:
                 print("Right: buzz high left")
                 continue
             else:
-                vibrate.low_vibration(0)
-                print("Right: buzz high  right")
-                continue
-        
+		if dist[7] > 200:
+			vibrate.low_vibration(1)
+			print("Wall ahead: rotate left") #wall ahead, left hallway clear
+		else:
+                	vibrate.low_vibration(0)
+                	print("Right  Sensors Activated: buzz low right")
+                	continue
+
         # center sensors  
         elif 150 < dist[3] < 200  or 150 < dist[4] < 200:
             x = 0
@@ -253,7 +282,11 @@ while True:
                 print("Left: high buzz right")
                 continue
             else:
-                vibrate.low_vibration(1)
-                print("Left: high buzz left")
-                continue
+		if dist[8] > 200:
+			vibrate.low_vibration(0)
+			print("Wall ahead: rotate right") #hallway to right is open
+		else:
+                	vibrate.low_vibration(1)
+                	print("Left Sensors Activated: buzz high left")
+                	continue
       
